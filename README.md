@@ -37,7 +37,8 @@ Assurez-vous que PostgreSQL est installé et en cours d'exécution.
 Créez une nouvelle base de données :
 
 
-CREATE DATABASE banque;
+    ```sql
+      CREATE DATABASE banque;
 
 Connectez-vous à la base de données :
 
@@ -49,16 +50,19 @@ Charger les données :
 Importez les fichiers de données situés dans le répertoire Data/ dans votre base de données. Vous pouvez utiliser les commandes COPY ou des outils d'importation spécifiques.
 
 ## Description du Projet
+
 Le projet modélise une banque avec les fonctionnalités suivantes :
 
-** Gestion des clients** : Prospects, clients actuels, anciens clients.
+**Gestion des clients** : Prospects, clients actuels, anciens clients.
 **Informations personnelles** : Stockage des informations personnelles des clients.
 **Comptes bancaires** : Comptes courants, comptes épargne.
 **Transactions** : Enregistrement des transactions bancaires.
 **Contrôles d'accès** : Mise en place de rôles et de permissions pour sécuriser l'accès aux données.
 
 ## Structure de la Base de Données
+
 **Tables Principales**
+
 personnal_info : Informations personnelles des individus.
 prospects : Informations sur les prospects.
 customers : Informations sur les clients actuels.
@@ -77,15 +81,15 @@ Schéma Relationnel
 
 Dans votre client SQL, exécutez le script Scripts/banque.sql pour créer les tables et insérer les données.
 
-
-\i Scripts/banque.sql
+    ```sql
+      \i Scripts/banque.sql
 
 **Vérification des données** :
 
 Utilisez des requêtes SELECT pour vérifier que les tables ont été correctement créées et peuplées.
 
-
-SELECT * FROM customers LIMIT 10;
+    ```sql
+      SELECT * FROM customers LIMIT 10;
 Exécution des requêtes spécifiques :
 
 Des exemples de requêtes pour extraire des informations spécifiques sont fournis dans la section suivante.
@@ -93,30 +97,38 @@ Requêtes Spécifiques
 Clients premium vivant en Île-de-France :
 
 
-SELECT * FROM premium_customers WHERE departement = 'Île-de-France';
+    ```sql
+      SELECT * FROM premium_customers WHERE departement = 'Île-de-France';
+      
 Clients normaux de nationalité australienne :
 
 
-SELECT * FROM free_customerd WHERE nationalite = 'Australian';
+    ```sql
+      SELECT * FROM free_customerd WHERE nationalite = 'Australian';
+      
 Comptes courants de clients âgés de plus de 30 ans vivant à Paris et de nationalité européenne :
 
 
-SELECT * FROM free_customerd
-WHERE age > 30 AND ville = 'PARIS' AND nationalite IN ('French', 'German', 'Hispanic', 'United_Kingdom');
+    ```sql
+      SELECT * FROM free_customerd
+      WHERE age > 30 AND ville = 'PARIS' AND nationalite IN ('French', 'German', 'Hispanic', 'United_Kingdom');
+
+      
 Statistiques par nationalité :
 
 
-SELECT 
-    sf.nationalite,
-    COUNT(CASE WHEN acc.account_type = 'compte_courant' AND fc.customer_id IS NOT NULL THEN 1 END) AS comptes_normaux,
-    COUNT(CASE WHEN acc.account_type = 'compte_courant' AND pc.customer_id IS NOT NULL THEN 1 END) AS comptes_premium,
-    COUNT(CASE WHEN acc.account_type = 'compte_epargne' THEN 1 END) AS comptes_epargne
-FROM set_fr sf
-LEFT JOIN accounts acc ON sf.customer_id = acc.customer_id
-LEFT JOIN free_customerd fc ON sf.customer_id = fc.customer_id
-LEFT JOIN premium_customers pc ON sf.customer_id = pc.customer_id
-GROUP BY sf.nationalite
-ORDER BY sf.nationalite;
+    ```sql
+      SELECT 
+          sf.nationalite,
+          COUNT(CASE WHEN acc.account_type = 'compte_courant' AND fc.customer_id IS NOT NULL THEN 1 END) AS comptes_normaux,
+          COUNT(CASE WHEN acc.account_type = 'compte_courant' AND pc.customer_id IS NOT NULL THEN 1 END) AS comptes_premium,
+          COUNT(CASE WHEN acc.account_type = 'compte_epargne' THEN 1 END) AS comptes_epargne
+      FROM set_fr sf
+      LEFT JOIN accounts acc ON sf.customer_id = acc.customer_id
+      LEFT JOIN free_customerd fc ON sf.customer_id = fc.customer_id
+      LEFT JOIN premium_customers pc ON sf.customer_id = pc.customer_id
+      GROUP BY sf.nationalite
+      ORDER BY sf.nationalite;
 
 ## Gestion des Droits d'Accès
 
@@ -140,14 +152,15 @@ dev : Droits de lecture, d'écriture, de mise à jour et de suppression sur tout
 **Création des utilisateurs et assignation des rôles** :
 
 
-CREATE USER user_ops WITH PASSWORD 'password';
-GRANT ops TO user_ops;
-
-CREATE USER user_auditeur WITH PASSWORD 'password';
-GRANT auditeurs TO user_auditeur;
-
-CREATE USER user_dev WITH PASSWORD 'password';
-GRANT dev TO user_dev;
+    ```sql
+      CREATE USER user_ops WITH PASSWORD 'password';
+      GRANT ops TO user_ops;
+      
+      CREATE USER user_auditeur WITH PASSWORD 'password';
+      GRANT auditeurs TO user_auditeur;
+      
+      CREATE USER user_dev WITH PASSWORD 'password';
+      GRANT dev TO user_dev;
 
 
 
